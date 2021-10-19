@@ -5,11 +5,13 @@ import InnerHeader from './innerHeader';
 
 export const TabIds = {
     HOME: 'home',
+    PRODUCTS: 'products',
     DISTRIBUTORS: 'distributors',
 };
 
 export const TabRoutes = {
     [TabIds.HOME]: '/',
+    [TabIds.PRODUCTS]: '/products',
     [TabIds.DISTRIBUTORS]: '/distributors',
 };
 
@@ -50,6 +52,7 @@ const Header = () => {
 
     const items = [
         { id: TabIds.HOME, title: 'Dashboard' },
+        { id: TabIds.PRODUCTS, title: 'Produucts' },
         { id: TabIds.DISTRIBUTORS, title: 'Distributors' },
     ];
 
