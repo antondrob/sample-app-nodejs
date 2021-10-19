@@ -9,6 +9,7 @@ import { FormData } from '../../types';
 const ProductInfo = () => {
     const router = useRouter();
     const encodedContext = useSession()?.context;
+    console.log(encodedContext);
     const pid = Number(router.query?.pid);
     const { error, isLoading, list = [], mutateList } = useProductList();
     const { isLoading: isInfoLoading, product } = useProductInfo(pid, list);
