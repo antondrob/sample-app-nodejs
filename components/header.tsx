@@ -5,12 +5,12 @@ import InnerHeader from './innerHeader';
 
 export const TabIds = {
     HOME: 'home',
-    PRODUCTS: 'products',
+    DISTRIBUTORS: 'distributors',
 };
 
 export const TabRoutes = {
     [TabIds.HOME]: '/',
-    [TabIds.PRODUCTS]: '/products',
+    [TabIds.DISTRIBUTORS]: '/distributors',
 };
 
 const InnerRoutes = [
@@ -49,8 +49,8 @@ const Header = () => {
     });
 
     const items = [
-        { id: TabIds.HOME, title: 'Home' },
-        { id: TabIds.PRODUCTS, title: 'Products' },
+        { id: TabIds.HOME, title: 'Dashboard' },
+        { id: TabIds.DISTRIBUTORS, title: 'Distributors' },
     ];
 
     const handleTabClick = (tabId: string) => {
