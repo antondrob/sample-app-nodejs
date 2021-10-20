@@ -1,0 +1,93 @@
+.distributors {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.link {
+    width: 30.6%;
+    margin: 0 2% 2% 0;
+    text-decoration: none;
+    box-shadow: 0 0px 10px -3px rgb(0 0 0);
+}
+
+.backgroundImage {
+    height: 300px;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    display: flex;
+    align-items: flex-end;
+}
+
+.distributorName{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50px;
+    background: #23282d;
+    color: #fff;
+}
+
+.distributorTitle{
+    margin-right: 2px;
+}
+
+.productsWrapper {
+    background-color: #f0f0f1;
+    border-radius: 10px;
+}
+
+.products {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+    padding: 15px;
+}
+
+.product {
+    position: relative;
+    display: grid;
+    background: white;
+    padding: 1%;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.storeLogo {
+    width: auto !important;
+    height: 35px !important;
+    position: relative;
+    top: 5px;
+    left: 5px;
+}
+
+.productName {
+    font-size: 14px;
+}
+
+.storePrice {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    align-self: end;
+}
+
+.addProduct{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #626262;
+    background: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    box-shadow: 0px 0px 10px -5px #3c3c3c;
+    cursor: pointer;
+}
+.productImage{
+    text-align: center;
+}

@@ -12,6 +12,28 @@ const Index = ({ context }: { context: string }) => {
 
     useEffect(() => {
         if (context) setContext(context);
+        const getToken = async () => {
+            const formData = new FormData();
+            formData.append("username", "antondrob");
+            formData.append("password", "Rj161311#");
+            const response = await fetch(`https://smokeshopwholesalers.com/wp-json/jwt-auth/v1/token`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('distributorToken')}`
+                },
+                body: formData,
+            });
+
+            if (response.ok) {
+                const body = await response.json();
+                localStorage.setItem('sswToken', body.token);
+                console.log(body);
+            } else {
+                console.log(response);
+                throw new Error('Ops...');
+            }
+        }
+        getToken();
     }, [context, setContext]);
 
     if (isLoading) return <Loading />;
