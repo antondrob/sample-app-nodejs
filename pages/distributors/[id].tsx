@@ -22,7 +22,7 @@ const Distributor = () => {
         try {
             const response = await fetch(`https://smokeshopwholesalers.com/wp-json/wc/v3/products/${serviceProductId}`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('distributorToken')}`,
+                    'Authorization': `Bearer ${localStorage.getItem('sswToken')}`,
                     'Content-Type': 'application/json'
                 }
             });
