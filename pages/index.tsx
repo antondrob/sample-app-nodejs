@@ -18,9 +18,6 @@ const Index = ({ context }: { context: string }) => {
             formData.append("password", "Rj161311#");
             const response = await fetch(`https://smokeshopwholesalers.com/wp-json/jwt-auth/v1/token`, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('distributorToken')}`
-                },
                 body: formData,
             });
 

@@ -52,7 +52,7 @@ const Header = () => {
 
     const items = [
         { id: TabIds.HOME, title: 'Dashboard' },
-        { id: TabIds.PRODUCTS, title: 'Produucts' },
+        { id: TabIds.PRODUCTS, title: 'Products' },
         { id: TabIds.DISTRIBUTORS, title: 'Distributors' },
     ];
 
