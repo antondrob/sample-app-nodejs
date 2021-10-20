@@ -2,9 +2,10 @@ import {Link, Panel} from "@bigcommerce/big-design";
 import {useEffect, useState} from "react";
 import styles from './distributors.module.css';
 import {useSession} from "../../context/session";
-import {backgroundImages} from "polished";
 
-const Distributors = ({context}: { context: string }) => {
+const Distributors = () => {
+    const encodedContext = useSession()?.context;
+    console.log(encodedContext);
 
     const [distributors, setDistributors] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -35,7 +36,7 @@ const Distributors = ({context}: { context: string }) => {
         }
         getDistributors();
     }, []);
-    console.log(context);
+
     return (
         <Panel header="Distributors">
             {distributors !== null ? <div className={styles.distributors}>
