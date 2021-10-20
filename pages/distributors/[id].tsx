@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import styles from './distributors.module.css';
 import {Panel} from "@bigcommerce/big-design";
 import Parser from 'html-react-parser';
-import { useSession } from '../../context/session';
+import {useSession} from '../../context/session';
 import {margin} from "polished";
 
 const Distributor = () => {
@@ -19,7 +19,7 @@ const Distributor = () => {
 
     const maybeCreateProduct = async (serviceProductId) => {
 
-        try{
+        try {
             const response = await fetch(`https://smokeshopwholesalers.com/wp-json/wc/v3/products/${serviceProductId}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('distributorToken')}`,
@@ -29,27 +29,40 @@ const Distributor = () => {
 
             if (response.ok) {
                 const body = await response.json();
-                fetch('?cont')
+                await fetch(`/api/products?context=${encodedContext}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        "name": "BigCommerce Coffee Mug",
+                        "price": "10.00",
+                        "categories": [
+                            23,
+                            21
+                        ],
+                        "weight": 4,
+                        "type": "physical"
+                    }),
+                });
                 console.log(body);
             } else {
                 console.log(response);
                 throw new Error('Ops...');
             }
             console.log();
-        }catch(error){
+        } catch (error) {
             alert(error.message);
         }
     }
 
     useEffect(() => {
-        if(!router.isReady) return;
+        if (!router.isReady) return;
         const getProducts = async () => {
-            try{
+            try {
                 const response = await fetch(`https://smokeshopwholesalers.com/wp-json/api/v1/products?distributor=${id}&posts_per_page=12`, {
                     method: 'GET',
                     redirect: 'follow',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('distributorToken')}`,
+                        'Authorization': `Bearer ${localStorage.getItem('sswToken')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -58,7 +71,7 @@ const Distributor = () => {
                 setStoreLogo(body.store_logo);
                 setStoreName(body.store_name);
                 setFoundPosts(body.found_posts);
-            }catch (error) {
+            } catch (error) {
                 alert(error.message);
             }
         }
@@ -73,13 +86,14 @@ const Distributor = () => {
                         return (
                             <li key={product.id} className={styles.product} data-product={product.id}>
                                 <img className={styles.storeLogo} src={storeLogo}
-                                     alt="Store Logo" />
+                                     alt="Store Logo"/>
                                 <div className={styles.productImage}>
                                     {Parser(product.image)}
                                 </div>
                                 <p className={styles.productName}>{product.name}</p>
                                 <p className={styles.storePrice}>{Parser(product.price_html)}</p>
-                                <span onClick={() => maybeCreateProduct(product.id)} className={styles.addProduct} data-product={product.id}>+</span>
+                                <span onClick={() => maybeCreateProduct(product.id)} className={styles.addProduct}
+                                      data-product={product.id}>+</span>
                             </li>
                         )
                     })}
