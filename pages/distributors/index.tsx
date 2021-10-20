@@ -41,13 +41,13 @@ const Distributors = () => {
         <Panel header="Distributors">
             {distributors !== null ? <div className={styles.distributors}>
                 {Object.keys(distributors).map(key => (
-                    <a key={key} className={styles.link} href={`distributors/${key}`}>
+                    <Link key={key} className={styles.link} href={`/distributors/${key}`}>
                         <div className={styles.backgroundImage} style={{backgroundImage: `url(${distributors[key].logo})`}}>
                             <div className={styles.distributorName}>
                                 <span className={styles.distributorTitle}>${distributors[key].store_name}</span>
                             </div>
                         </div>
-                    </a>
+                    </Link>
                 ))}
             </div> : error !== null ? <p>{error}</p> : null}
         </Panel>
