@@ -1,7 +1,8 @@
-import {Link, Panel} from "@bigcommerce/big-design";
+import {Panel} from "@bigcommerce/big-design";
 import {useEffect, useState} from "react";
 import styles from './distributors.module.css';
 import {useSession} from "../../context/session";
+import Link from 'next/link';
 
 const Distributors = () => {
     const encodedContext = useSession()?.context;
