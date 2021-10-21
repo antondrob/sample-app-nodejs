@@ -7,7 +7,6 @@ export default async function products(req: NextApiRequest, res: NextApiResponse
         query: { pid },
         method,
     } = req;
-
     switch (method) {
         case 'GET':
             try {
@@ -37,6 +36,4 @@ export default async function products(req: NextApiRequest, res: NextApiResponse
             res.setHeader('Allow', ['GET', 'PUT']);
             res.status(405).end(`Method ${method} Not Allowed`);
     }
-
-
 }

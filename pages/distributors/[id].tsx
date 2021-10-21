@@ -55,10 +55,20 @@ const Distributor = () => {
                         }
                     });
                 }
-                await fetch(`/api/products?context=${encodedContext}`, {
+                const newProduct = await fetch(`/api/products?context=${encodedContext}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(bcProduct),
+                });
+                await fetch(`/api/products/${newProduct.id}/images?context=${encodedContext}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        "is_thumbnail": true,
+                        "sort_order": 1,
+                        "description": "Top View",
+                        "image_url": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Anglel_Bless_Legendary_Hills_1_m%C4%9Bs%C3%ADc_st%C3%A1%C5%99%C3%AD.jpg"
+                    }),
                 });
             } else {
                 console.log(response);
