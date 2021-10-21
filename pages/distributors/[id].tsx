@@ -40,7 +40,7 @@ const Distributor = () => {
                     custom_fields: [
                         {
                             name: '_external_product_id',
-                            value: wooProduct.id
+                            value: wooProduct.id.toString()
                         }
                     ]
                 };
