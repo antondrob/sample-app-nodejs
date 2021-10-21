@@ -3,7 +3,6 @@ import {useEffect, useState} from "react";
 import styles from './distributors.module.css';
 import {useSession} from "../../context/session";
 import Link from 'next/link';
-import { bigcommerceClient, getSession } from '../../lib/auth';
 
 const Distributors = () => {
     const encodedContext = useSession()?.context;

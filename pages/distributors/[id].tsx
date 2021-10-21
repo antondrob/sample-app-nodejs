@@ -25,24 +25,41 @@ const Distributor = () => {
                     'Content-Type': 'application/json'
                 }
             });
-
             if (response.ok) {
-                const body = await response.json();
+                const wooProduct = await response.json();
+                console.log(wooProduct);
+                let bcProduct: any = {
+                    name: wooProduct.name,
+                    type: wooProduct.virtual ? 'digital ' : 'physical',
+                    weight: wooProduct.weight ? wooProduct.weight : 0,
+                    price: wooProduct.price ? wooProduct.price : 0,
+                    retail_price: wooProduct.regular_price ? wooProduct.regular_price : 0,
+                    sale_price: wooProduct.sale_price ? wooProduct.sale_price : 0,
+                    description: wooProduct.description,
+                    sku: wooProduct.sku ? wooProduct.sku : wooProduct.id,
+                    custom_fields: [
+                        {
+                            name: '_external_product_id',
+                            value: wooProduct.id
+                        }
+                    ]
+                };
+                if (wooProduct.type === 'variable') {
+                    wooProduct.variations.forEach((el, index) => {
+                        bcProduct.variants[index] = {
+                            price: el.price,
+                            sale_price: el.sale_price,
+                            retail_price: el.regular_price,
+                            weight: el.weight,
+                            sku: el.sku
+                        }
+                    });
+                }
                 await fetch(`/api/products?context=${encodedContext}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        "name": "BigCommerce Coffee Mug",
-                        "price": "10.00",
-                        "categories": [
-                            23,
-                            21
-                        ],
-                        "weight": 4,
-                        "type": "physical"
-                    }),
+                    body: JSON.stringify(bcProduct),
                 });
-                console.log(body);
             } else {
                 console.log(response);
                 throw new Error('Ops...');
