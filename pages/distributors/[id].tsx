@@ -55,7 +55,7 @@ const Distributor = () => {
                         }
                     });
                 }
-                const newProduct = await fetch(`/api/products?context=${encodedContext}`, {
+                const newProduct: any = await fetch(`/api/products?context=${encodedContext}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(bcProduct),
