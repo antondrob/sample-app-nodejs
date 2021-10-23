@@ -60,13 +60,6 @@ const Distributor = () => {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(bcProduct),
                 });
-                // fetch(`/api/products?context=${encodedContext}`, {
-                //     method: 'POST',
-                //     headers: {'Content-Type': 'application/json'},
-                //     body: JSON.stringify(bcProduct),
-                // })
-                //     .then(data => console.log(data))
-                //     .catch(error => console.log(error));
                 if (wooProduct.images.length > 0) {
                     const newProductBody = await newProductResponse.json();
                     console.log(newProductBody);
