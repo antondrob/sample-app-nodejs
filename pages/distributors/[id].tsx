@@ -60,8 +60,9 @@ const Distributor = () => {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(bcProduct),
                 });
+                const newProductBody = newProduct.json();
                 console.log(newProduct);
-                await fetch(`/api/products/${newProduct.id}/images?context=${encodedContext}`, {
+                await fetch(`/api/products/${newProductBody.id}/images?context=${encodedContext}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
