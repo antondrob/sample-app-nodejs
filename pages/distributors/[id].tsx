@@ -55,32 +55,32 @@ const Distributor = () => {
                         }
                     });
                 }
-                // const newProductResponse: any = await fetch(`/api/products?context=${encodedContext}`, {
-                //     method: 'POST',
-                //     headers: {'Content-Type': 'application/json'},
-                //     body: JSON.stringify(bcProduct),
-                // });
-                fetch(`/api/products?context=${encodedContext}`, {
+                const newProductResponse: any = await fetch(`/api/products?context=${encodedContext}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(bcProduct),
-                })
-                    .then(data => console.log(data))
-                    .catch(error => console.log(error));
-                // if (wooProduct.images.length > 0) {
-                //     const newProductBody = newProductResponse.json();
-                //     console.log(newProductBody);
-                //     await fetch(`/api/products/${newProductBody.id}/images?context=${encodedContext}`, {
-                //         method: 'POST',
-                //         headers: {'Content-Type': 'application/json'},
-                //         body: JSON.stringify({
-                //             is_thumbnail: true,
-                //             sort_order: 1,
-                //             description: wooProduct.images[0].name ? wooProduct.images[0].name : '',
-                //             image_url: wooProduct.images[0].src
-                //         }),
-                //     });
-                // }
+                });
+                // fetch(`/api/products?context=${encodedContext}`, {
+                //     method: 'POST',
+                //     headers: {'Content-Type': 'application/json'},
+                //     body: JSON.stringify(bcProduct),
+                // })
+                //     .then(data => console.log(data))
+                //     .catch(error => console.log(error));
+                if (wooProduct.images.length > 0) {
+                    const newProductBody = await newProductResponse.json();
+                    console.log(newProductBody);
+                    await fetch(`/api/products/${newProductBody.id}/images?context=${encodedContext}`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            is_thumbnail: true,
+                            sort_order: 1,
+                            description: wooProduct.images[0].name ? wooProduct.images[0].name : '',
+                            image_url: wooProduct.images[0].src
+                        }),
+                    });
+                }
             } else {
                 console.log(response);
                 throw new Error('Ops...');
