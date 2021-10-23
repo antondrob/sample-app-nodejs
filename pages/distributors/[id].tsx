@@ -14,6 +14,7 @@ const Distributor = () => {
     const [foundPosts, setFoundPosts] = useState(null);
     const [load, setLoad] = useState(false);
     const [page, setPage] = useState(0);
+    const [error, setError] = useState(null);
 
     const encodedContext = useSession()?.context;
 
@@ -65,7 +66,9 @@ const Distributor = () => {
                     console.log(newProductBody);
                     await fetch(`/api/products/${newProductBody.id}/images?context=${encodedContext}`, {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify({
                             is_thumbnail: true,
                             sort_order: 1,
@@ -103,8 +106,8 @@ const Distributor = () => {
 
             setPage(page + 1);
         } catch (error) {
-            // setLoad(false);
-            alert(error.message);
+            setLoad(false);
+            setError(error.message);
         }
     }
     useEffect(() => {
