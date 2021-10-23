@@ -11,7 +11,7 @@ export default async function images(req: NextApiRequest, res: NextApiResponse) 
     try {
         const {accessToken, storeHash} = await getSession(req);
         const bigcommerce = bigcommerceClient(accessToken, storeHash);
-        const {data} = await bigcommerce.post('/catalog/products/{product_id}/images', body);
+        const {data} = await bigcommerce.post(`/catalog/products/${pid}/images`, body);
         res.status(200).json(data);
     } catch (error) {
         const {message, response} = error;

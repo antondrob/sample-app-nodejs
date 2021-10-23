@@ -59,7 +59,7 @@ const Distributor = () => {
                 const newProductResponse: any = await fetch(`/api/products?context=${encodedContext}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(bcProduct),
+                    body: JSON.stringify(bcProduct)
                 });
                 if (wooProduct.images.length > 0) {
                     const newProductBody = await newProductResponse.json();
@@ -67,14 +67,15 @@ const Distributor = () => {
                     await fetch(`/api/products/${newProductBody.id}/images?context=${encodedContext}`, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
                         },
                         body: JSON.stringify({
                             is_thumbnail: true,
                             sort_order: 1,
                             description: wooProduct.images[0].name ? wooProduct.images[0].name : '',
                             image_url: wooProduct.images[0].src
-                        }),
+                        })
                     });
                 }
             } else {
