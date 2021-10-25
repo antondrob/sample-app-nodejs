@@ -7,7 +7,7 @@ export default async function images(req: NextApiRequest, res: NextApiResponse) 
         query: { pid },
         method,
     } = req;
-    console.log(body);
+
     try {
         const {accessToken, storeHash} = await getSession(req);
         const bigcommerce = bigcommerceClient(accessToken, storeHash);

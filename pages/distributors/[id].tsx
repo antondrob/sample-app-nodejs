@@ -1,9 +1,10 @@
 import {useRouter} from 'next/router'
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import styles from './distributors.module.css';
 import {Panel, Button} from "@bigcommerce/big-design";
 import Parser from 'html-react-parser';
 import {useSession} from '../../context/session';
+import Select from 'react-select';
 
 const Distributor = () => {
     const router = useRouter()
@@ -14,7 +15,10 @@ const Distributor = () => {
     const [foundPosts, setFoundPosts] = useState(null);
     const [load, setLoad] = useState(false);
     const [page, setPage] = useState(0);
-    const [error, setError] = useState(null);
+    const [productError, setProductError] = useState(null);
+    const [catError, setCatError] = useState(null);
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [categories, setCategories] = useState(null);
 
     const encodedContext = useSession()?.context;
 
@@ -87,7 +91,6 @@ const Distributor = () => {
             alert(error.message);
         }
     }
-    console.log(products);
     const getProducts = async () => {
         try {
             const response = await fetch(`https://smokeshopwholesalers.com/wp-json/api/v1/products?distributor=${id}&posts_per_page=12&page=${page}`, {
@@ -104,34 +107,38 @@ const Distributor = () => {
             setStoreName(body.store_name);
             setFoundPosts(body.found_posts);
             setLoad(false);
-
             setPage(page + 1);
         } catch (error) {
             setLoad(false);
-            setError(error.message);
+            setProductError(error.message);
+        }
+    }
+    const getCategories = async () => {
+        try {
+            const response = await fetch(`/api/categories?context=${encodedContext}`, {
+                method: 'GET',
+                redirect: 'follow'
+            });
+            const body = await response.json();
+            console.log(body);
+        } catch (error) {
+            setCatError(error.message);
         }
     }
     useEffect(() => {
         if (!router.isReady) return;
-
         getProducts();
-        // const handleScroll = () => {
-        //     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-        //         if (load === false) {
-        //             getProducts();
-        //         }
-        //     }
-        // }
-        // window.addEventListener('scroll', async () => {
-        //     setLoad(true);
-        //     await handleScroll();
-        //     setLoad(false);
-        // });
-        // return () => {
-        //     window.removeEventListener('scroll', handleScroll);
-        // }
-
+        getCategories();
     }, [])
+
+    const selectItem = (productId) => {
+        const index = selectedItems.indexOf(productId);
+        if (index > -1) {
+            setSelectedItems(selectedItems.filter(el => el !== productId));
+        } else {
+            setSelectedItems([...selectedItems, productId]);
+        }
+    }
 
     return (
         <Panel className={styles.productsWrapper}>
@@ -140,7 +147,9 @@ const Distributor = () => {
                     <ul className={styles.products}>
                         {products.map(product => {
                             return (
-                                <li key={product.id} className={styles.product} data-product={product.id}>
+                                <li key={product.id} onClick={() => selectItem(product.id)}
+                                    className={`${styles.product} ${selectedItems.indexOf(product.id) > -1 ? styles.selectedItem : ''}`}
+                                    data-product={product.id}>
                                     <img className={styles.storeLogo} src={storeLogo}
                                          alt="Store Logo"/>
                                     <div className={styles.productImage}>
@@ -162,6 +171,30 @@ const Distributor = () => {
                             Load More
                         </Button>
                     </div>
+                    {selectedItems.length > 0 && <div className={styles.popup}>
+                        <p>Selected products: <span id="selected-products">{selectedItems.length}</span></p>
+                        {categories ! == null && <div>
+                            <div className="existing-cats">
+                                <Select options={categories}/>
+                                <a href="#" className="add-new-cat-link">Add new</a>
+                            </div>
+                            <div className="add-new-cat">
+                                <label htmlFor="product_cat">New category</label>
+                                <input type="text" id="product_cat" name="product_cat"/>
+                                <label htmlFor="product_cat">Parent category</label>
+                                <Select options={[
+                                    {value: 'chocolate', label: 'Chocolate'},
+                                    {value: 'strawberry', label: 'Strawberry'},
+                                    {value: 'vanilla', label: 'Vanilla'}
+                                ]}/>
+                                <a href="#" className="cancel-link">Cancel</a>
+                            </div>
+                            <div id="import-actions">
+                                <button className="button">Import</button>
+                                <a href="#" className="cancel">Cancel</a>
+                            </div>
+                        </div>}
+                    </div>}
 
                 </> : <p>No products found...</p>}
             </div>
