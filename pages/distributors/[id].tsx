@@ -2,6 +2,7 @@ import {useRouter} from 'next/router'
 import {useCallback, useEffect, useState} from "react";
 import styles from './distributors.module.css';
 import {Panel, Button, Input, Select, Link as StyledLink, ProgressCircle} from "@bigcommerce/big-design";
+import {AddIcon} from '@bigcommerce/big-design-icons';
 import Parser from 'html-react-parser';
 import {useSession} from '../../context/session';
 
@@ -25,8 +26,9 @@ const Distributor = () => {
     const [addNewCat, setAddNewCat] = useState(false);
     const [newCat, setNewCat] = useState('');
     const [existingCat, setExistingCat] = useState('');
-
+    const [loadingProducts, setLoadingProducts] = useState([]);
     const encodedContext = useSession()?.context;
+    const [importedProducts, setImportedProducts] = useState([]);
 
     const maybeCreateProduct = async (serviceProductId) => {
         try {
@@ -38,7 +40,6 @@ const Distributor = () => {
             });
             if (response.ok) {
                 const wooProduct = await response.json();
-                console.log(wooProduct);
                 let bcProduct: any = {
                     name: wooProduct.name,
                     type: wooProduct.virtual ? 'digital ' : 'physical',
@@ -71,9 +72,8 @@ const Distributor = () => {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(bcProduct)
                 });
-                if (wooProduct.images.length > 0) {
-                    const newProductBody = await newProductResponse.json();
-                    console.log(newProductBody);
+                const newProductBody = await newProductResponse.json();
+                if (wooProduct.images.length > 0 && newProductBody?.id) {
                     await fetch(`/api/products/${newProductBody.id}/images?context=${encodedContext}`, {
                         method: 'POST',
                         headers: {
@@ -87,14 +87,17 @@ const Distributor = () => {
                             image_url: wooProduct.images[0].src
                         })
                     });
+                    setImportedProducts([...importedProducts, serviceProductId])
                 }
+                // setLoadingProducts(loadingProducts.filter(el => el !== serviceProductId));
             } else {
                 console.log(response);
+                // setLoadingProducts(loadingProducts.filter(el => el !== serviceProductId));
                 throw new Error('Ops...');
             }
-            console.log();
         } catch (error) {
-            alert(error.message);
+            // setLoadingProducts(loadingProducts.filter(el => el !== serviceProductId));
+            // alert(error.message);
         }
     }
     const getProducts = async () => {
@@ -142,7 +145,10 @@ const Distributor = () => {
         getCategories();
     }, [])
 
-    const selectItem = (productId) => {
+    const selectItem = (productId, tagName) => {
+        if (tagName === 'path' || tagName === 'svg') {
+            return false;
+        }
         const index = selectedItems.indexOf(productId);
         if (index > -1) {
             setSelectedItems(selectedItems.filter(el => el !== productId));
@@ -153,7 +159,9 @@ const Distributor = () => {
 
     const importProducts = async () => {
         for (const selectedItem of selectedItems) {
+            setLoadingProducts([...loadingProducts, selectedItem]);
             await maybeCreateProduct(selectedItem);
+            setLoadingProducts(loadingProducts.filter(el => el !== selectedItem));
         }
     }
     return (
@@ -163,8 +171,8 @@ const Distributor = () => {
                     <ul className={styles.products}>
                         {products.map(product => {
                             return (
-                                <li key={product.id} onClick={() => selectItem(product.id)}
-                                    className={`${styles.product} ${selectedItems.indexOf(product.id) > -1 ? styles.selectedItem : ''}`}
+                                <li key={product.id} onClick={(event) => selectItem(product.id, event.target.tagName)}
+                                    className={`${styles.product}${selectedItems.includes(product.id) ? ` ${styles.selectedItem}` : ''}${loadingProducts.includes(product.id) ? ` ${styles.loadingItem}` : ''}${importedProducts.includes(product.id) ? ` ${styles.importedItem}` : ''}`}
                                     data-product={product.id}>
                                     <img className={styles.storeLogo} src={storeLogo}
                                          alt="Store Logo"/>
@@ -173,8 +181,16 @@ const Distributor = () => {
                                     </div>
                                     <p className={styles.productName}>{product.name}</p>
                                     <p className={styles.storePrice}>{Parser(product.price_html)}</p>
-                                    <span onClick={() => maybeCreateProduct(product.id)} className={styles.addProduct}
-                                          data-product={product.id}>+</span>
+
+                                    <span className={styles.addProduct}
+                                          data-product={product.id}>
+                                        {loadingProducts.includes(product.id) ? <ProgressCircle size="xSmall"/> :
+                                            <AddIcon onClick={async () => {
+                                                setLoadingProducts([...loadingProducts, product.id]);
+                                                await maybeCreateProduct(product.id);
+                                                setLoadingProducts(loadingProducts.filter(el => el !== product.id));
+                                            }}/>}
+                                    </span>
                                 </li>
                             )
                         })}
@@ -235,7 +251,8 @@ const Distributor = () => {
                         </div>}
                     </div>}
 
-                </> : productError !== null ? <p>{productError}</p> : <div className={styles.progressBarWrapper}><ProgressCircle size="large"/></div>}
+                </> : productError !== null ? <p>{productError}</p> :
+                    <div className={styles.progressBarWrapper}><ProgressCircle size="large"/></div>}
             </div>
         </Panel>
 

@@ -76,11 +76,9 @@
     position: absolute;
     top: 10px;
     right: 10px;
-    font-size: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #626262;
     background: white;
     width: 32px;
     height: 32px;
@@ -125,6 +123,14 @@
     margin-top: 10px;
 }
 
-.progressBarWrapper{
+.progressBarWrapper {
     text-align: center;
+}
+
+.loadingItem {
+    pointer-events: none;
+}
+
+.importedItem {
+    opacity: .5;
 }
