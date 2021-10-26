@@ -19,6 +19,8 @@ const Distributor = () => {
     const [catError, setCatError] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [categories, setCategories] = useState(null);
+    const [addNewCat, setAddNewCat] = useState(false);
+    const [newCat, setNewCat] = useState('');
 
     const encodedContext = useSession()?.context;
 
@@ -119,8 +121,12 @@ const Distributor = () => {
                 method: 'GET',
                 redirect: 'follow'
             });
-            const body = await response.json();
-            console.log(body);
+            if (response.ok) {
+                const body = await response.json();
+                setCategories(body);
+            } else {
+                throw new Error(response.statusText)
+            }
         } catch (error) {
             setCatError(error.message);
         }
@@ -172,23 +178,30 @@ const Distributor = () => {
                         </Button>
                     </div>
                     {selectedItems.length > 0 && <div className={styles.popup}>
-                        <p>Selected products: <span id="selected-products">{selectedItems.length}</span></p>
-                        {categories ! == null && <div>
-                            <div className="existing-cats">
-                                <Select options={categories}/>
-                                <a href="#" className="add-new-cat-link">Add new</a>
-                            </div>
-                            <div className="add-new-cat">
+                        <p>Selected products: <span>{selectedItems.length}</span></p>
+                        {categories !== null && <div>
+                            {!addNewCat && <div className={styles.existingCats}>
+                                <select name="cat_for_selected">
+                                    <option value="">-Choose category-</option>
+                                    {categories.map(el => (
+                                        <option key={el.id} value={el.id}>{el.name}</option>
+                                    ))}
+                                    <option className="level-0" value="101">Smokeshopnearme</option>
+                                </select>
+                                <a href="#" onClick={() => setAddNewCat(true)}>Add new</a>
+                            </div>}
+                            {addNewCat && <div className="add-new-cat">
                                 <label htmlFor="product_cat">New category</label>
-                                <input type="text" id="product_cat" name="product_cat"/>
-                                <label htmlFor="product_cat">Parent category</label>
-                                <Select options={[
-                                    {value: 'chocolate', label: 'Chocolate'},
-                                    {value: 'strawberry', label: 'Strawberry'},
-                                    {value: 'vanilla', label: 'Vanilla'}
-                                ]}/>
-                                <a href="#" className="cancel-link">Cancel</a>
-                            </div>
+                                <input value={newCat} type="text" name="product_cat" onChange={(event) => setNewCat(event.target.value)}/>
+                                <label htmlFor="cat_for_selected">Parent category</label>
+                                <select name="cat_for_selected">
+                                    <option value="">-Choose category-</option>
+                                    {categories.map(el => (
+                                        <option key={el.id} value={el.id}>{el.name}</option>
+                                    ))}
+                                </select>
+                                <a href="#" onClick={() => setAddNewCat(false)}>Cancel</a>
+                            </div>}
                             <div id="import-actions">
                                 <button className="button">Import</button>
                                 <a href="#" className="cancel">Cancel</a>
