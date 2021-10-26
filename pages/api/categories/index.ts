@@ -31,7 +31,7 @@ export default async function categories(req: NextApiRequest, res: NextApiRespon
             }
             break;
         default:
-            res.setHeader('Allow', ['GET', 'PUT']);
+            res.setHeader('Allow', ['GET', 'POST']);
             res.status(405).end(`Method ${method} Not Allowed`);
     }
 }

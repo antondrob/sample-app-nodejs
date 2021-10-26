@@ -31,7 +31,7 @@ export default async function products(req: NextApiRequest, res: NextApiResponse
                 res.status(response?.status || 500).json({message});
             }
         default:
-            res.setHeader('Allow', ['GET', 'PUT']);
+            res.setHeader('Allow', ['GET', 'POST']);
             res.status(405).end(`Method ${method} Not Allowed`);
     }
 }

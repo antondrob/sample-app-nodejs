@@ -21,7 +21,7 @@ const Distributor = () => {
     const [categories, setCategories] = useState([]);
     const [addNewCat, setAddNewCat] = useState(false);
     const [newCat, setNewCat] = useState('');
-    const [existingCat, setExistingCat] = useState('');
+    const [existingCat, setExistingCat] = useState(0);
     const [loadingProducts, setLoadingProducts] = useState([]);
     const encodedContext = useSession()?.context;
     const [importedProducts, setImportedProducts] = useState([]);
@@ -181,7 +181,7 @@ const Distributor = () => {
                 const body = await response.json();
                 await getCategories();
                 setCreateCatLoad(false);
-                setExistingCat('');
+                setExistingCat(0);
                 setNewCat('');
                 setAddNewCat(false);
             } else {
@@ -247,7 +247,7 @@ const Distributor = () => {
                                 />
                                 <StyledLink href="#" onClick={(e) => {
                                     e.preventDefault();
-                                    setExistingCat('');
+                                    setExistingCat(0);
                                     setAddNewCat(true);
                                 }}>Add new</StyledLink>
                             </div>}
@@ -270,7 +270,7 @@ const Distributor = () => {
                                 <div className={styles.createCatActions}>
                                     <Button variant="subtle" onClick={(e) => {
                                         e.preventDefault();
-                                        setExistingCat('');
+                                        setExistingCat(0);
                                         setNewCat('');
                                         setAddNewCat(false);
                                     }}>Cancel</Button>
