@@ -123,6 +123,10 @@
     margin-top: 10px;
 }
 
+.createCatActions {
+    composes: importActions
+}
+
 .progressBarWrapper {
     text-align: center;
 }

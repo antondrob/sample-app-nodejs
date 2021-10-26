@@ -18,17 +18,14 @@ const Distributor = () => {
     const [productError, setProductError] = useState(null);
     const [catError, setCatError] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
-    const [categories, setCategories] = useState([
-        {value: 'us', content: 'United States'},
-        {value: 'mx', content: 'Mexico'},
-        {value: 'ca', content: 'Canada'},
-    ]);/*TODO: return null*/
+    const [categories, setCategories] = useState([]);
     const [addNewCat, setAddNewCat] = useState(false);
     const [newCat, setNewCat] = useState('');
     const [existingCat, setExistingCat] = useState('');
     const [loadingProducts, setLoadingProducts] = useState([]);
     const encodedContext = useSession()?.context;
     const [importedProducts, setImportedProducts] = useState([]);
+    const [createCatLoad, setCreateCatLoad] = useState(false);
 
     const maybeCreateProduct = async (serviceProductId) => {
         try {
@@ -67,28 +64,35 @@ const Distributor = () => {
                         }
                     });
                 }
+                if (existingCat) {
+                    bcProduct.categories = [existingCat]
+                }
                 const newProductResponse: any = await fetch(`/api/products?context=${encodedContext}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(bcProduct)
                 });
                 const newProductBody = await newProductResponse.json();
-                if (wooProduct.images.length > 0 && newProductBody?.id) {
-                    await fetch(`/api/products/${newProductBody.id}/images?context=${encodedContext}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            is_thumbnail: true,
-                            sort_order: 1,
-                            description: wooProduct.images[0].name ? wooProduct.images[0].name : '',
-                            image_url: wooProduct.images[0].src
-                        })
-                    });
-                    setImportedProducts([...importedProducts, serviceProductId])
+                if (newProductBody?.id) {
+                    if (wooProduct.images.length > 0) {
+                        await fetch(`/api/products/${newProductBody.id}/images?context=${encodedContext}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                is_thumbnail: true,
+                                sort_order: 1,
+                                description: wooProduct.images[0].name ? wooProduct.images[0].name : '',
+                                image_url: wooProduct.images[0].src
+                            })
+                        });
+
+                        await setImportedProducts([...importedProducts, serviceProductId])
+                    }
                 }
+
             } else {
                 console.log(response);
                 throw new Error('Ops...');
@@ -161,6 +165,34 @@ const Distributor = () => {
             setLoadingProducts(loadingProducts.filter(el => el !== selectedItem));
         }
     }
+
+    const createCategory = async () => {
+        setCreateCatLoad(true);
+        try {
+            const response = await fetch(`/api/categories?context=${encodedContext}`, {
+                method: 'POST',
+                redirect: 'follow',
+                body: JSON.stringify({
+                    parent_id: existingCat,
+                    name: newCat
+                })
+            });
+            if (response.ok) {
+                const body = await response.json();
+                await getCategories();
+                setCreateCatLoad(false);
+                setExistingCat('');
+                setNewCat('');
+                setAddNewCat(false);
+            } else {
+                throw new Error(response.statusText);
+            }
+        } catch (error) {
+            setCreateCatLoad(false);
+            alert(error.message)
+        }
+    }
+
     return (
         <Panel className={styles.productsWrapper}>
             <div className={products.length > 0 ? styles.productsWrapper : ''}>
@@ -168,7 +200,8 @@ const Distributor = () => {
                     <ul className={styles.products}>
                         {products.map(product => {
                             return (
-                                <li key={product.id} onClick={(event) => selectItem(product.id, (event.target as HTMLElement).tagName)}
+                                <li key={product.id}
+                                    onClick={(event) => selectItem(product.id, (event.target as HTMLElement).tagName)}
                                     className={`${styles.product}${selectedItems.includes(product.id) ? ` ${styles.selectedItem}` : ''}${loadingProducts.includes(product.id) ? ` ${styles.loadingItem}` : ''}${importedProducts.includes(product.id) ? ` ${styles.importedItem}` : ''}`}
                                     data-product={product.id}>
                                     <img className={styles.storeLogo} src={storeLogo}
@@ -234,17 +267,22 @@ const Distributor = () => {
                                     value={existingCat}
                                     onOptionChange={(val) => setExistingCat(val)}
                                 />
-                                <StyledLink href="#" onClick={(e) => {
-                                    e.preventDefault();
-                                    setExistingCat('');
-                                    setNewCat('');
-                                    setAddNewCat(false);
-                                }}>Cancel</StyledLink>
+                                <div className={styles.createCatActions}>
+                                    <Button variant="subtle" onClick={(e) => {
+                                        e.preventDefault();
+                                        setExistingCat('');
+                                        setNewCat('');
+                                        setAddNewCat(false);
+                                    }}>Cancel</Button>
+                                    <Button variant="secondary" onClick={createCategory}
+                                            isLoading={createCatLoad}>Create</Button>
+                                </div>
+
                             </div>}
-                            <div className={styles.importActions}>
+                            {!addNewCat && <div className={styles.importActions}>
                                 <Button variant="subtle">Cancel</Button>
                                 <Button variant="secondary" onClick={importProducts}>Import</Button>
-                            </div>
+                            </div>}
                         </div>}
                     </div>}
 
