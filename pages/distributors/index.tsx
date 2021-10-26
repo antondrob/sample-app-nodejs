@@ -1,4 +1,4 @@
-import {Panel} from "@bigcommerce/big-design";
+import {Panel, ProgressCircle} from "@bigcommerce/big-design";
 import {useEffect, useState} from "react";
 import styles from './distributors.module.css';
 import {useSession} from "../../context/session";
@@ -7,7 +7,6 @@ import Link from 'next/link';
 const Distributors = () => {
     const encodedContext = useSession()?.context;
     console.log(encodedContext);
-
     const [distributors, setDistributors] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -53,7 +52,8 @@ const Distributors = () => {
                         </a>
                     </Link>
                 ))}
-            </div> : error !== null ? <p>{error}</p> : null}
+            </div> : error !== null ? <p>{error}</p> :
+                <div className={styles.progressBarWrapper}><ProgressCircle size="large"/></div>}
         </Panel>
     );
 }

@@ -1,7 +1,7 @@
 import {useRouter} from 'next/router'
 import {useCallback, useEffect, useState} from "react";
 import styles from './distributors.module.css';
-import {Panel, Button, Input, Select, Link as StyledLink} from "@bigcommerce/big-design";
+import {Panel, Button, Input, Select, Link as StyledLink, ProgressCircle} from "@bigcommerce/big-design";
 import Parser from 'html-react-parser';
 import {useSession} from '../../context/session';
 
@@ -150,16 +150,15 @@ const Distributor = () => {
             setSelectedItems([...selectedItems, productId]);
         }
     }
-    
+
     const importProducts = async () => {
         for (const selectedItem of selectedItems) {
             await maybeCreateProduct(selectedItem);
         }
     }
-
     return (
         <Panel className={styles.productsWrapper}>
-            <div className={styles.productsWrapper}>
+            <div className={products.length > 0 ? styles.productsWrapper : ''}>
                 {products.length > 0 ? <>
                     <ul className={styles.products}>
                         {products.map(product => {
@@ -236,7 +235,7 @@ const Distributor = () => {
                         </div>}
                     </div>}
 
-                </> : <p>No products found...</p>}
+                </> : productError !== null ? <p>{productError}</p> : <div className={styles.progressBarWrapper}><ProgressCircle size="large"/></div>}
             </div>
         </Panel>
 

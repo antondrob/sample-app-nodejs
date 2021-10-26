@@ -124,3 +124,7 @@
     justify-content: space-between;
     margin-top: 10px;
 }
+
+.progressBarWrapper{
+    text-align: center;
+}
