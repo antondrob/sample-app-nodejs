@@ -1,10 +1,9 @@
 import {useRouter} from 'next/router'
 import {useCallback, useEffect, useState} from "react";
 import styles from './distributors.module.css';
-import {Panel, Button} from "@bigcommerce/big-design";
+import {Panel, Button, Input, Select, Link as StyledLink} from "@bigcommerce/big-design";
 import Parser from 'html-react-parser';
 import {useSession} from '../../context/session';
-import Select from 'react-select';
 
 const Distributor = () => {
     const router = useRouter()
@@ -18,9 +17,14 @@ const Distributor = () => {
     const [productError, setProductError] = useState(null);
     const [catError, setCatError] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
-    const [categories, setCategories] = useState(null);
+    const [categories, setCategories] = useState([
+        {value: 'us', content: 'United States'},
+        {value: 'mx', content: 'Mexico'},
+        {value: 'ca', content: 'Canada'},
+    ]);/*TODO: return null*/
     const [addNewCat, setAddNewCat] = useState(false);
     const [newCat, setNewCat] = useState('');
+    const [existingCat, setExistingCat] = useState('');
 
     const encodedContext = useSession()?.context;
 
@@ -121,9 +125,10 @@ const Distributor = () => {
                 method: 'GET',
                 redirect: 'follow'
             });
+            console.log(response.ok);
             if (response.ok) {
                 const body = await response.json();
-                setCategories(body);
+                setCategories(body.map(el => ({value: el.id, content: el.name})));
             } else {
                 throw new Error(response.statusText)
             }
@@ -181,30 +186,45 @@ const Distributor = () => {
                         <p>Selected products: <span>{selectedItems.length}</span></p>
                         {categories !== null && <div>
                             {!addNewCat && <div className={styles.existingCats}>
-                                <select name="cat_for_selected">
-                                    <option value="">-Choose category-</option>
-                                    {categories.map(el => (
-                                        <option key={el.id} value={el.id}>{el.name}</option>
-                                    ))}
-                                    <option className="level-0" value="101">Smokeshopnearme</option>
-                                </select>
-                                <a href="#" onClick={() => setAddNewCat(true)}>Add new</a>
+                                <Select
+                                    filterable={true}
+                                    placeholder={'Choose category'}
+                                    options={categories}
+                                    value={existingCat}
+                                    onOptionChange={(val) => setExistingCat(val)}
+                                    required
+                                />
+                                <StyledLink href="#" onClick={(e) => {
+                                    e.preventDefault();
+                                    setExistingCat('');
+                                    setAddNewCat(true);
+                                }}>Add new</StyledLink>
                             </div>}
-                            {addNewCat && <div className="add-new-cat">
-                                <label htmlFor="product_cat">New category</label>
-                                <input value={newCat} type="text" name="product_cat" onChange={(event) => setNewCat(event.target.value)}/>
+                            {addNewCat && <div className={styles.existingCats}>
+                                <Input
+                                    value={newCat}
+                                    type="text"
+                                    onChange={(event) => setNewCat(event.target.value)}
+                                    label="New category"
+                                    required
+                                />
                                 <label htmlFor="cat_for_selected">Parent category</label>
-                                <select name="cat_for_selected">
-                                    <option value="">-Choose category-</option>
-                                    {categories.map(el => (
-                                        <option key={el.id} value={el.id}>{el.name}</option>
-                                    ))}
-                                </select>
-                                <a href="#" onClick={() => setAddNewCat(false)}>Cancel</a>
+                                <Select
+                                    filterable={true}
+                                    placeholder={'Choose category'}
+                                    options={categories}
+                                    value={existingCat}
+                                    onOptionChange={(val) => setExistingCat(val)}
+                                />
+                                <StyledLink href="#" onClick={(e) => {
+                                    e.preventDefault();
+                                    setExistingCat('');
+                                    setAddNewCat(false);
+                                }}>Cancel</StyledLink>
                             </div>}
-                            <div id="import-actions">
-                                <button className="button">Import</button>
-                                <a href="#" className="cancel">Cancel</a>
+                            <div className={styles.importActions}>
+                                <Button variant="subtle">Cancel</Button>
+                                <Button variant="secondary">Import</Button>
                             </div>
                         </div>}
                     </div>}
