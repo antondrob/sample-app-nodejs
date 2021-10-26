@@ -89,15 +89,12 @@ const Distributor = () => {
                     });
                     setImportedProducts([...importedProducts, serviceProductId])
                 }
-                // setLoadingProducts(loadingProducts.filter(el => el !== serviceProductId));
             } else {
                 console.log(response);
-                // setLoadingProducts(loadingProducts.filter(el => el !== serviceProductId));
                 throw new Error('Ops...');
             }
         } catch (error) {
-            // setLoadingProducts(loadingProducts.filter(el => el !== serviceProductId));
-            // alert(error.message);
+            console.log(error.message);
         }
     }
     const getProducts = async () => {
@@ -171,7 +168,7 @@ const Distributor = () => {
                     <ul className={styles.products}>
                         {products.map(product => {
                             return (
-                                <li key={product.id} onClick={(event) => selectItem(product.id, event.target.tagName)}
+                                <li key={product.id} onClick={(event) => selectItem(product.id, (event.target as HTMLElement).tagName)}
                                     className={`${styles.product}${selectedItems.includes(product.id) ? ` ${styles.selectedItem}` : ''}${loadingProducts.includes(product.id) ? ` ${styles.loadingItem}` : ''}${importedProducts.includes(product.id) ? ` ${styles.importedItem}` : ''}`}
                                     data-product={product.id}>
                                     <img className={styles.storeLogo} src={storeLogo}
