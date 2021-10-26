@@ -150,6 +150,12 @@ const Distributor = () => {
             setSelectedItems([...selectedItems, productId]);
         }
     }
+    
+    const importProducts = async () => {
+        for (const selectedItem of selectedItems) {
+            await maybeCreateProduct(selectedItem);
+        }
+    }
 
     return (
         <Panel className={styles.productsWrapper}>
@@ -208,10 +214,10 @@ const Distributor = () => {
                                     label="New category"
                                     required
                                 />
-                                <label htmlFor="cat_for_selected">Parent category</label>
                                 <Select
                                     filterable={true}
                                     placeholder={'Choose category'}
+                                    label="Parent category"
                                     options={categories}
                                     value={existingCat}
                                     onOptionChange={(val) => setExistingCat(val)}
@@ -219,12 +225,13 @@ const Distributor = () => {
                                 <StyledLink href="#" onClick={(e) => {
                                     e.preventDefault();
                                     setExistingCat('');
+                                    setNewCat('');
                                     setAddNewCat(false);
                                 }}>Cancel</StyledLink>
                             </div>}
                             <div className={styles.importActions}>
                                 <Button variant="subtle">Cancel</Button>
-                                <Button variant="secondary">Import</Button>
+                                <Button variant="secondary" onClick={importProducts}>Import</Button>
                             </div>
                         </div>}
                     </div>}
