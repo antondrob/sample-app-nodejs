@@ -21,9 +21,11 @@ export default async function categories(req: NextApiRequest, res: NextApiRespon
             break;
         case 'POST':
             try {
+                console.log('start');
                 const {accessToken, storeHash} = await getSession(req);
                 const bigcommerce = bigcommerceClient(accessToken, storeHash);
                 const {data} = await bigcommerce.post('/catalog/categories', body);
+                console.log('end');
                 res.status(200).json(data);
             } catch (error) {
                 const {message, response} = error;

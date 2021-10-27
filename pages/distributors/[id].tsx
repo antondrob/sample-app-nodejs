@@ -5,6 +5,7 @@ import {Panel, Button, Input, Select, Link as StyledLink, ProgressCircle} from "
 import {AddIcon} from '@bigcommerce/big-design-icons';
 import Parser from 'html-react-parser';
 import {useSession} from '../../context/session';
+import SearchFilter from '../../components/SearchFilter';
 
 const Distributor = () => {
     const router = useRouter()
@@ -172,6 +173,10 @@ const Distributor = () => {
             const response = await fetch(`/api/categories?context=${encodedContext}`, {
                 method: 'POST',
                 redirect: 'follow',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify({
                     parent_id: existingCat,
                     name: newCat
@@ -193,8 +198,13 @@ const Distributor = () => {
         }
     }
 
+    const searchProducts = async() => {
+        await
+    }
+
     return (
         <Panel className={styles.productsWrapper}>
+            <SearchFilter searchProducts={searchProducts} />
             <div className={products.length > 0 ? styles.productsWrapper : ''}>
                 {products.length > 0 ? <>
                     <ul className={styles.products}>
