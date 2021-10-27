@@ -199,7 +199,7 @@ const Distributor = () => {
     }
 
     const searchProducts = async() => {
-        await
+
     }
 
     return (
