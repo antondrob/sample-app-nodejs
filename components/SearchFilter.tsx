@@ -1,11 +1,10 @@
 import {useState} from "react";
 import {Button, Input} from "@bigcommerce/big-design";
 
-const SearchFilter = ({}) => {
+const SearchFilter = ({searchProducts}) => {
     const [value, setValue] = useState('');
 
     const handleChange = (event) => setValue(event.target.value);
-    const search
 
     return (
         <>
