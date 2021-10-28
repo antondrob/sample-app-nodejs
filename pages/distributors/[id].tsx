@@ -8,6 +8,7 @@ import {useSession} from '../../context/session';
 import SearchFilter from '@components/search-filter/SearchFilter';
 import {TGetProducts} from "../../types/products";
 import {FiltersContext} from '../../context/filters';
+import BulkImport from '../../components/bulk-import/BulkImport';
 
 const Distributor = () => {
     const router = useRouter();
@@ -18,9 +19,9 @@ const Distributor = () => {
     const [foundPosts, setFoundPosts] = useState(null);
     const [load, setLoad] = useState(false);
     const [productError, setProductError] = useState(null);
-    const [catError, setCatError] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [remoteCategories, setRemoteCategories] = useState(null);
     const [addNewCat, setAddNewCat] = useState(false);
     const [newCat, setNewCat] = useState('');
     const [existingCat, setExistingCat] = useState(0);
@@ -28,14 +29,17 @@ const Distributor = () => {
     const encodedContext = useSession()?.context;
     const [importedProducts, setImportedProducts] = useState([]);
     const [createCatLoad, setCreateCatLoad] = useState(false);
+    const [attributes, setAttributes] = useState(null);
+    const [bulkPopup, setBulkPopup] = useState(false);
+
     const postsPerPage = 12;
 
     const {filters, setFilters} = useContext(FiltersContext);
-    console.log(filters);
+
     const getImportedProducts = () => {
         return importedProducts;
     }
-    const maybeCreateProduct = async (serviceProductId) => {
+    const maybeCreateProduct = async (serviceProductId, bulk = false) => {
         try {
             const response = await fetch(`https://smokeshopwholesalers.com/wp-json/wc/v3/products/${serviceProductId}`, {
                 headers: {
@@ -96,8 +100,10 @@ const Distributor = () => {
                                 image_url: wooProduct.images[0].src
                             })
                         });
+                        if (!bulk) {
+                            setImportedProducts([...importedProducts, serviceProductId])
+                        }
 
-                        await setImportedProducts([...getImportedProducts(), serviceProductId])
                     }
                 }
 
@@ -156,13 +162,68 @@ const Distributor = () => {
                 throw new Error(response.statusText)
             }
         } catch (error) {
-            setCatError(error.message);
+            console.log('local categories', error);
+        }
+    }
+    const getRemoteCategories = async () => {
+        try {
+            const response = await fetch(`https://smokeshopwholesalers.com/wp-json/api/v1/categories/${id}?platform=bigcommerce`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('sswToken')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (response.ok) {
+                const body = await response.json();
+                if (body instanceof Object) {
+                    const options = Object.keys(body).map(key => {
+                        return {value: body[key].term_id, content: body[key].name}
+                    });
+                    setRemoteCategories(options);
+                } else {
+                    throw new Error('Array was expected. Make sure you passed platform param.');
+                }
+
+            } else {
+                throw new Error(response.statusText);
+            }
+        } catch (error) {
+            console.log('remote category', error);
         }
     }
     useEffect(() => {
         if (!router.isReady) return;
+        const getAttributes = async () => {
+            try {
+                const response = await fetch(`https://smokeshopwholesalers.com/wp-json/api/v1/attributes/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('sswToken')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (response.ok) {
+                    const body = await response.json();
+                    console.log(body);
+                    const options = Object.keys(body).map(key => {
+                        return {
+                            label: key,
+                            options: body[key].map(el => {
+                                return {value: el.ID, content: el.name}
+                            })
+                        }
+                    });
+                    setAttributes(options);
+                } else {
+                    throw new Error(response.statusText);
+                }
+            } catch (error) {
+                console.log('attributes', error);
+            }
+        }
         getProducts(filters);
         getCategories();
+        getRemoteCategories();
+        getAttributes();
         return () => {
             setFilters({
                 search: '',
@@ -224,9 +285,15 @@ const Distributor = () => {
         }
     }
 
+    const toggleBulkImport = async () => {
+        setBulkPopup(!bulkPopup);
+    }
+
     return (
         <Panel className={styles.productsWrapper}>
-            <SearchFilter getProducts={getProducts}/>
+            {remoteCategories !== null && attributes !== null &&
+            <SearchFilter toggleBulkImport={toggleBulkImport} getProducts={getProducts} categories={remoteCategories}
+                          attributes={attributes}/>}
             <div className={products.length > 0 ? styles.productsWrapper : ''}>
                 {products.length > 0 ? <>
                     <ul className={styles.products}>
@@ -318,9 +385,12 @@ const Distributor = () => {
                         </div>}
                     </div>}
 
-                </> : productError !== null ? <p>{productError}</p> :
+                </> : productError !== null ? <p>{productError}</p> : foundPosts === 0 ? <p>No products found...</p> :
                     <div className={styles.progressBarWrapper}><ProgressCircle size="large"/></div>}
             </div>
+            {categories !== null &&
+            <BulkImport toggleBulkImport={toggleBulkImport} opened={bulkPopup} categories={categories}
+                        maybeCreateProduct={maybeCreateProduct}/>}
         </Panel>
 
     )
