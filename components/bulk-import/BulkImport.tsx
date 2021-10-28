@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useReducer, useState} from "react";
 import styles from './bulkImport.module.css';
 import {useRouter} from "next/router";
 import {ProgressCircle, H3, Select, Button, Text} from "@bigcommerce/big-design";
@@ -12,6 +12,7 @@ const BulkUpload = ({toggleBulkImport, opened, categories, maybeCreateProduct}) 
     const [load, setLoad] = useState(false);
     const [importing, setImporting] = useState(false);
     const [chosenCategory, setChosenCategory] = useState('');
+    const [importedProducts, setImportedProducts] = useState([]);
 
     useEffect(() => {
         if (!router.isReady) return;
@@ -40,11 +41,11 @@ const BulkUpload = ({toggleBulkImport, opened, categories, maybeCreateProduct}) 
     }, [opened])
     const startImport = async () => {
         setImporting(true);
-        const productsForImport = products;
-        for (const product of productsForImport) {
+        for (const product of products) {
             await maybeCreateProduct(product.id, true);
-            await setProducts(products.slice(1));
+            await setImportedProducts([...importedProducts, product.id]);
         }
+        setImporting(false);
     }
     if (!opened) return null;
     return (
@@ -75,7 +76,9 @@ const BulkUpload = ({toggleBulkImport, opened, categories, maybeCreateProduct}) 
                             variant="primary">Import</Button>
                 </div>
                 {products.length > 0 ? <ol className={styles.productsList}>
-                    {products.map(el => {
+                    {products.map((el, index) => {
+                        console.log(importedProducts.length);
+                        if (importedProducts.includes(el.id)) return null;
                         return (
                             <li key={el.id}>{el.name}</li>
                         )
