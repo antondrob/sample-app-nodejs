@@ -1,21 +1,22 @@
 import {useRouter} from 'next/router'
-import {useCallback, useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import styles from './distributors.module.css';
 import {Panel, Button, Input, Select, Link as StyledLink, ProgressCircle} from "@bigcommerce/big-design";
 import {AddIcon} from '@bigcommerce/big-design-icons';
 import Parser from 'html-react-parser';
 import {useSession} from '../../context/session';
-import SearchFilter from '../../components/SearchFilter';
+import SearchFilter from '@components/search-filter/SearchFilter';
+import {TGetProducts} from "../../types/products";
+import {FiltersContext} from '../../context/filters';
 
 const Distributor = () => {
-    const router = useRouter()
-    const {id} = router.query
+    const router = useRouter();
+    const {id} = router.query;
     const [products, setProducts] = useState([]);
     const [storeLogo, setStoreLogo] = useState(null);
     const [storeName, setStoreName] = useState(null);
     const [foundPosts, setFoundPosts] = useState(null);
     const [load, setLoad] = useState(false);
-    const [page, setPage] = useState(0);
     const [productError, setProductError] = useState(null);
     const [catError, setCatError] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
@@ -27,7 +28,13 @@ const Distributor = () => {
     const encodedContext = useSession()?.context;
     const [importedProducts, setImportedProducts] = useState([]);
     const [createCatLoad, setCreateCatLoad] = useState(false);
+    const postsPerPage = 12;
 
+    const {filters, setFilters} = useContext(FiltersContext);
+    console.log(filters);
+    const getImportedProducts = () => {
+        return importedProducts;
+    }
     const maybeCreateProduct = async (serviceProductId) => {
         try {
             const response = await fetch(`https://smokeshopwholesalers.com/wp-json/wc/v3/products/${serviceProductId}`, {
@@ -90,7 +97,7 @@ const Distributor = () => {
                             })
                         });
 
-                        await setImportedProducts([...importedProducts, serviceProductId])
+                        await setImportedProducts([...getImportedProducts(), serviceProductId])
                     }
                 }
 
@@ -102,9 +109,13 @@ const Distributor = () => {
             console.log(error.message);
         }
     }
-    const getProducts = async () => {
+    const getProducts = async (params: TGetProducts, filter = false) => {
+        const esc = encodeURIComponent;
+        const query = Object.keys(params)
+            .map(k => esc(k) + '=' + esc(params[k]))
+            .join('&');
         try {
-            const response = await fetch(`https://smokeshopwholesalers.com/wp-json/api/v1/products?distributor=${id}&posts_per_page=12&page=${page}`, {
+            const response = await fetch(`https://smokeshopwholesalers.com/wp-json/api/v1/products?distributor=${id}&posts_per_page=${postsPerPage}&${query}`, {
                 method: 'GET',
                 redirect: 'follow',
                 headers: {
@@ -113,12 +124,19 @@ const Distributor = () => {
                 }
             });
             const body = await response.json();
-            setProducts([...products, ...body.products]);
+            if (filter) {
+                setProducts(body.found_posts > 0 ? body.products : []);
+            } else {
+                setProducts([...products, ...body.products]);
+            }
             setStoreLogo(body.store_logo);
             setStoreName(body.store_name);
             setFoundPosts(body.found_posts);
             setLoad(false);
-            setPage(page + 1);
+            setFilters({
+                ...params,
+                page: filter ? 1 : params.page + 1
+            });
         } catch (error) {
             setLoad(false);
             setProductError(error.message);
@@ -143,8 +161,16 @@ const Distributor = () => {
     }
     useEffect(() => {
         if (!router.isReady) return;
-        getProducts();
+        getProducts(filters);
         getCategories();
+        return () => {
+            setFilters({
+                search: '',
+                attribute: '',
+                category: '',
+                page: 0
+            });
+        }
     }, [])
 
     const selectItem = (productId, tagName) => {
@@ -198,13 +224,9 @@ const Distributor = () => {
         }
     }
 
-    const searchProducts = async() => {
-
-    }
-
     return (
         <Panel className={styles.productsWrapper}>
-            <SearchFilter searchProducts={searchProducts} />
+            <SearchFilter getProducts={getProducts}/>
             <div className={products.length > 0 ? styles.productsWrapper : ''}>
                 {products.length > 0 ? <>
                     <ul className={styles.products}>
@@ -235,14 +257,14 @@ const Distributor = () => {
                             )
                         })}
                     </ul>
-                    <div className={styles.loadMore}>
+                    {foundPosts > postsPerPage && <div className={styles.loadMore}>
                         <Button onClick={() => {
                             setLoad(true);
-                            getProducts();
+                            getProducts(filters);
                         }} actionType="normal" isLoading={load} variant="secondary">
                             Load More
                         </Button>
-                    </div>
+                    </div>}
                     {selectedItems.length > 0 && <div className={styles.popup}>
                         <p>Selected products: <span>{selectedItems.length}</span></p>
                         {categories !== null && <div>

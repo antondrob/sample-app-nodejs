@@ -1,28 +1,37 @@
-import { Box, GlobalStyles } from '@bigcommerce/big-design';
-import type { AppProps } from 'next/app';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import {Box, GlobalStyles} from '@bigcommerce/big-design';
+import type {AppProps} from 'next/app';
+import {useRouter} from 'next/router';
+import {createContext, useEffect, useState} from 'react';
 import Header from '../components/header';
 import SessionProvider from '../context/session';
-import { bigCommerceSDK } from '../scripts/bcSdk';
+import {bigCommerceSDK} from '../scripts/bcSdk';
+import {FiltersContext} from '../context/filters';
 
-const MyApp = ({ Component, pageProps }: AppProps) => {
+const MyApp = ({Component, pageProps}: AppProps) => {
     const router = useRouter();
-    const { query: { context } } = router;
+    const {query: {context}} = router;
+    const [filters, setFilters] = useState({
+        search: '',
+        attribute: '',
+        category: '',
+        page: 0
+    });
+    const value = {filters, setFilters};
 
     useEffect(() => {
-        // Keeps app in sync with BC (e.g. heatbeat, user logout, etc)
         if (context) bigCommerceSDK(context);
     }, [context]);
 
     return (
         <>
-            <GlobalStyles />
+            <GlobalStyles/>
             <Box marginHorizontal="xxxLarge" marginVertical="xxLarge">
-                <Header />
-                <SessionProvider>
-                    <Component {...pageProps} />
-                </SessionProvider>
+                <Header/>
+                <FiltersContext.Provider value={value}>
+                    <SessionProvider>
+                        <Component {...pageProps} />
+                    </SessionProvider>
+                </FiltersContext.Provider>
             </Box>
         </>
     );

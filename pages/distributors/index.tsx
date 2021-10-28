@@ -46,7 +46,7 @@ const Distributors = () => {
                             <div className={styles.backgroundImage}
                                  style={{backgroundImage: `url(${distributors[key].logo})`}}>
                                 <div className={styles.distributorName}>
-                                    <span className={styles.distributorTitle}>${distributors[key].store_name}</span>
+                                    <span className={styles.distributorTitle}>{distributors[key].store_name}</span>
                                 </div>
                             </div>
                         </a>

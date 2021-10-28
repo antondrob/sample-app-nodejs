@@ -1,0 +1,13 @@
+.filters {
+    background: #007eff2b;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-end;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.filters > div {
+    margin-right: 10px;
+}
