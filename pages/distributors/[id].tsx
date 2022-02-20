@@ -72,7 +72,7 @@ const Distributor = () => {
                             sale_price: el.sale_price,
                             retail_price: el.regular_price,
                             weight: el.weight,
-                            sku: el.sku
+                            sku: el.sku.toString()
                         }
                     });
                 }
