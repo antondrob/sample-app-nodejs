@@ -57,7 +57,7 @@ const Distributor = () => {
                     retail_price: wooProduct.regular_price ? wooProduct.regular_price : 0,
                     sale_price: wooProduct.sale_price ? wooProduct.sale_price : 0,
                     description: wooProduct.description,
-                    sku: wooProduct.sku ? wooProduct.sku : wooProduct.id,
+                    sku: wooProduct.id.toString(),
                     custom_fields: [
                         {
                             name: '_external_product_id',
@@ -72,7 +72,7 @@ const Distributor = () => {
                             sale_price: el.sale_price,
                             retail_price: el.regular_price,
                             weight: el.weight,
-                            sku: el.sku.toString()
+                            sku: el.id.toString()
                         }
                     });
                 }
