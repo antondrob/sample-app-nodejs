@@ -17,7 +17,7 @@ export default async function products(req: NextApiRequest, res: NextApiResponse
                 res.status(200).json(data);
             } catch (error) {
                 const {message, response} = error;
-                res.status(response?.status || 205).json({message});
+                res.status(205).json({message});
             }
             break;
         case 'POST':
@@ -28,7 +28,7 @@ export default async function products(req: NextApiRequest, res: NextApiResponse
                 res.status(200).json(data);
             } catch (error) {
                 const {message, response} = error;
-                res.status(response?.status || 205).json({message});
+                res.status(205).json({message});
             }
         default:
             res.setHeader('Allow', ['GET', 'POST']);
