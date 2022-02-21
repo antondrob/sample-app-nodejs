@@ -35,9 +35,9 @@ const Distributor = () => {
 
     const {filters, setFilters} = useContext(FiltersContext);
 
-    const getImportedProducts = async() => {
-        return importedProducts;
-    }
+    // const getImportedProducts = async() => {
+    //     return importedProducts;
+    // }
     const maybeCreateProduct = async (serviceProductId, bulk = false) => {
         try {
             const response = await fetch(`https://smokeshopwholesalers.com/wp-json/wc/v3/products/${serviceProductId}`, {
@@ -134,12 +134,13 @@ const Distributor = () => {
                 return el.id;
             });
             console.log(skus);
-            const importedProducts: any = fetch(`/api/products?context=${encodedContext}&sku:in=${skus.join(',')}`, {
+            const getImportedProducts: any = fetch(`/api/products?context=${encodedContext}&sku:in=${skus.join(',')}`, {
                 method: 'GET',
                 headers: {'Content-Type': 'application/json'}
             });
-            const importedProductsBody = await importedProducts.json();
+            const importedProductsBody = await getImportedProducts.json();
             console.log(importedProductsBody);
+
             if (filter) {
                 setProducts(body.found_posts > 0 ? body.products : []);
             } else {
