@@ -130,11 +130,11 @@ const Distributor = () => {
             });
             const body = await response.json();
             console.log(body);
-            const skus = body.products.map(el => {
+            let skus = body.products.map(el => {
                 return el.id;
             });
-            console.log(skus);
-            const getImportedProducts: any = fetch(`/api/products?context=${encodedContext}&sku:in=${skus.join(',')}`, {
+            skus = skus.join(',');
+            const getImportedProducts: any = fetch(`/api/products?context=${encodedContext}&sku:in=${skus}`, {
                 method: 'GET',
                 headers: {'Content-Type': 'application/json'}
             });
