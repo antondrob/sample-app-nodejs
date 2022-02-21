@@ -130,12 +130,16 @@ const Distributor = () => {
             });
             const body = await response.json();
             console.log(body);
-            // const importedProducts: any = fetch(`/api/products?context=${encodedContext}&`, {
-            //     method: 'GET',
-            //     headers: {'Content-Type': 'application/json'}
-            // });
-            // const importedProductsBody = await importedProducts.json();
-            // console.log(importedProductsBody);
+            const skus = body.products.map(el => {
+                return el.id;
+            });
+            console.log(skus);
+            const importedProducts: any = fetch(`/api/products?context=${encodedContext}&sku:in=${skus.join(',')}`, {
+                method: 'GET',
+                headers: {'Content-Type': 'application/json'}
+            });
+            const importedProductsBody = await importedProducts.json();
+            console.log(importedProductsBody);
             if (filter) {
                 setProducts(body.found_posts > 0 ? body.products : []);
             } else {
