@@ -11,8 +11,9 @@ export default async function products(req: NextApiRequest, res: NextApiResponse
         case 'GET':
             try {
                 const {accessToken, storeHash} = await getSession(req);
-                console.log('accessToken', accessToken);
-                console.log('storeHash', storeHash);
+
+                console.log('req', req);
+                // console.log('storeHash', storeHash);
                 const bigcommerce = bigcommerceClient(accessToken, storeHash);
 
                 const {data} = await bigcommerce.get('/catalog/summary');
