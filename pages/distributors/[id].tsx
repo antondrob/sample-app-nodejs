@@ -27,7 +27,7 @@ const Distributor = () => {
     const [existingCat, setExistingCat] = useState(0);
     const [loadingProducts, setLoadingProducts] = useState([]);
     const encodedContext = useSession()?.context;
-    const [importedProducts, setImportedProducts] = useState([]);
+    const [importedProducts, setImportedProducts] = useState([18086, 18088, 18090, 18092]);
     const [createCatLoad, setCreateCatLoad] = useState(false);
     const [bulkPopup, setBulkPopup] = useState(false);
 
