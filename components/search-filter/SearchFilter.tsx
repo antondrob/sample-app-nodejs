@@ -5,7 +5,7 @@ import {useRouter} from "next/router";
 import {DeleteIcon} from '@bigcommerce/big-design-icons';
 import styles from './searchFilter.module.css';
 
-const SearchFilter = ({toggleBulkImport, getProducts, categories, attributes}) => {
+const SearchFilter = ({toggleBulkImport, getProducts, categories}) => {
     const router = useRouter();
     const {id} = router.query;
     const [loading, setLoading] = useState(false);
@@ -43,28 +43,6 @@ const SearchFilter = ({toggleBulkImport, getProducts, categories, attributes}) =
                     placeholder={'Select a category'}
                     required
                     value={filters.category}
-                />
-                <Select
-                    action={{
-                        actionType: 'destructive' as const,
-                        content: 'Remove attribute',
-                        icon: <DeleteIcon/>,
-                        onActionClick: () => setFilters({
-                            ...filters,
-                            attribute: ''
-                        }),
-                    }}
-                    filterable={true}
-                    label="Attributes"
-                    maxHeight={300}
-                    onOptionChange={(val) => setFilters({
-                        ...filters,
-                        attribute: val
-                    })}
-                    options={attributes}
-                    placeholder={'Select an attribute'}
-                    required
-                    value={filters.attribute}
                 />
                 <Input
                     label="Search"

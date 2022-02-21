@@ -29,7 +29,6 @@ const Distributor = () => {
     const encodedContext = useSession()?.context;
     const [importedProducts, setImportedProducts] = useState([]);
     const [createCatLoad, setCreateCatLoad] = useState(false);
-    const [attributes, setAttributes] = useState(null);
     const [bulkPopup, setBulkPopup] = useState(false);
 
     const postsPerPage = 12;
@@ -193,37 +192,9 @@ const Distributor = () => {
     }
     useEffect(() => {
         if (!router.isReady) return;
-        const getAttributes = async () => {
-            try {
-                const response = await fetch(`https://smokeshopwholesalers.com/wp-json/api/v1/attributes/${id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('sswToken')}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                if (response.ok) {
-                    const body = await response.json();
-                    console.log(body);
-                    const options = Object.keys(body).map(key => {
-                        return {
-                            label: key,
-                            options: body[key].map(el => {
-                                return {value: el.ID, content: el.name}
-                            })
-                        }
-                    });
-                    setAttributes(options);
-                } else {
-                    throw new Error(response.statusText);
-                }
-            } catch (error) {
-                console.log('attributes', error);
-            }
-        }
         getProducts(filters);
         getCategories();
         getRemoteCategories();
-        getAttributes();
         return () => {
             setFilters({
                 search: '',
@@ -291,9 +262,8 @@ const Distributor = () => {
 
     return (
         <Panel className={styles.productsWrapper}>
-            {remoteCategories !== null && attributes !== null &&
-            <SearchFilter toggleBulkImport={toggleBulkImport} getProducts={getProducts} categories={remoteCategories}
-                          attributes={attributes}/>}
+            {remoteCategories !== null &&
+            <SearchFilter toggleBulkImport={toggleBulkImport} getProducts={getProducts} categories={remoteCategories} />}
             <div className={products.length > 0 ? styles.productsWrapper : ''}>
                 {products.length > 0 ? <>
                     <ul className={styles.products}>

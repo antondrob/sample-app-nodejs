@@ -29,6 +29,7 @@ export default async function products(req: NextApiRequest, res: NextApiResponse
                 res.status(200).json(data);
             } catch (error) {
                 const { message, response } = error;
+                console.log('response', response);
                 res.status(response?.status || 500).json({ message });
             }
             break;
