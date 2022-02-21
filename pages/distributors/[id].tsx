@@ -129,7 +129,7 @@ const Distributor = () => {
                 }
             });
             const body = await response.json();
-            console.log(body);
+            // console.log(body);
             let skus = body.products.map(el => {
                 return el.id;
             });
@@ -138,8 +138,6 @@ const Distributor = () => {
                 method: 'GET',
                 headers: {'Content-Type': 'application/json'}
             });
-            const importedProductsBody = await getImportedProducts.json();
-            console.log(importedProductsBody);
 
             if (filter) {
                 setProducts(body.found_posts > 0 ? body.products : []);
