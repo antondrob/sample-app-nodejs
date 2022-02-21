@@ -35,7 +35,7 @@ const Distributor = () => {
 
     const {filters, setFilters} = useContext(FiltersContext);
 
-    const getImportedProducts = () => {
+    const getImportedProducts = async() => {
         return importedProducts;
     }
     const maybeCreateProduct = async (serviceProductId, bulk = false) => {
@@ -129,6 +129,13 @@ const Distributor = () => {
                 }
             });
             const body = await response.json();
+            console.log(body);
+            // const importedProducts: any = fetch(`/api/products?context=${encodedContext}&`, {
+            //     method: 'GET',
+            //     headers: {'Content-Type': 'application/json'}
+            // });
+            // const importedProductsBody = await importedProducts.json();
+            // console.log(importedProductsBody);
             if (filter) {
                 setProducts(body.found_posts > 0 ? body.products : []);
             } else {
